@@ -5,59 +5,203 @@ import { taskMiddleware } from "react-palm/tasks";
 import { Provider, useDispatch } from "react-redux";
 import KeplerGl from "kepler.gl";
 import { addDataToMap } from "kepler.gl/actions";
-import useSwr from "swr";
-
+import * as ExcelJS from "exceljs";
+// import useSwr from "swr";
+// import Uploading from "./Uploading";
+import {useState} from "react";
+import {processCsvData} from 'kepler.gl/processors';
+import './uploading.css'
+const MAX_COUNT = 5;
 const reducers = combineReducers({
   keplerGl: keplerGlReducer
 });
 
+
 const store = createStore(reducers, {}, applyMiddleware(taskMiddleware));
+
 
 export default function App() {
   return (
     <Provider store={store}>
+      <Uploading />
       <Map />
     </Provider>
   );
 }
 
-function Map() {
-  const dispatch = useDispatch();
-  const { data } = useSwr("covid", async () => {
-    const response = await fetch(
-      "https://gist.githubusercontent.com/leighhalliday/a994915d8050e90d413515e97babd3b3/raw/a3eaaadcc784168e3845a98931780bd60afb362f/covid19.json"
-    );
-    const data = await response.json();
-    return data;
-  });
 
-  React.useEffect(() => {
-    if (data) {
-      dispatch(
-        addDataToMap({
-          datasets: {
-            info: {
-              label: "COVID-19",
-              id: "covid19"
-            },
-            data
-          },
-          option: {
-            centerMap: true,
-            readOnly: false
-          },
-          config: {}
-        })
-      );
-    }
-  }, [dispatch, data]);
+
+
+
+
+
+function Map() {
 
   return (
     <KeplerGl
       id="covid"
-      mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_API}
+      mapboxApiAccessToken='pk.eyJ1IjoiZWt0bGFncmFuemgxIiwiYSI6ImNrczZkd3EwbzAwczkycW96b3ZpbGJuaTMifQ.hVA0mIakF4asjiJmh7gPEA'//{process.env.REACT_APP_MAPBOX_API}
       width={window.innerWidth}
       height={window.innerHeight}
     />
   );
+
 }
+
+
+
+
+function Uploading() {
+
+    const [uploadedFiles, setUploadedFiles] = useState([])
+    const [fileLimit, setFileLimit] = useState(false);
+    const [newData, setnewData] = useState(' ');
+
+    const dispatch = useDispatch();
+
+
+    React.useEffect(() => {
+        if (newData!=''&& newData == null) {
+            console.log('UPDATED', newData)
+            const dataset = {
+                info: {id: 'test_data', label: 'My Csv'},
+                data: processCsvData(newData)
+            };
+
+            dispatch(addDataToMap({
+                datasets: [dataset],
+                options: {centerMap: true, readOnly: true}
+            }));
+        }
+    }, [dispatch, newData]);
+
+
+
+    const handleUploadFiles = files => {
+
+        const uploaded = [...uploadedFiles];
+        let limitExceeded = false;
+        files.some(async (file) => {
+            let data;
+            if (uploaded.findIndex((f) => f.name === file.name) === -1) {
+                uploaded.push(file);
+                console.log('MY FILE', file)
+
+                data = await excelToJson(file);
+
+                setnewData(data);
+
+
+                if (uploaded.length === MAX_COUNT) setFileLimit(true);
+                if (uploaded.length > MAX_COUNT) {
+                    alert(`You can only add a maximum of ${MAX_COUNT} files`);
+                    setFileLimit(false);
+                    limitExceeded = true;
+                    return true;
+                }
+            }
+        })
+        if (!limitExceeded) setUploadedFiles(uploaded)
+
+    }
+
+    const handleFileEvent =  (e) => {
+        const chosenFiles = Array.prototype.slice.call(e.target.files)
+        handleUploadFiles(chosenFiles);
+    }
+
+    return (
+        <div className="Uploading">
+
+            <input id='fileUpload' type='file' multiple
+                   accept='.xlsx, .xls'
+                   onChange={handleFileEvent}
+                   disabled={fileLimit}
+            />
+
+            <label htmlFor='fileUpload'>
+                <a  className={`btn btn-primary ${!fileLimit ? '' : 'disabled' } `}>Upload Files</a>
+            </label>
+
+            <div className="uploaded-files-list">
+                {uploadedFiles.map(file => (
+                    <div >
+                        {file.name}
+                    </div>
+                ))}
+            </div>
+
+        </div>
+    );
+}
+
+function excelToJson(file) {
+
+
+    let fields = ["latitude","longitude"];
+    let rows =[];
+    let res;
+    const wb = new ExcelJS.Workbook();
+    const reader = new FileReader()
+
+    reader.readAsArrayBuffer(file)
+    reader.onload = () => {
+        const buffer = reader.result;
+        wb.xlsx.load(buffer).then(workbook => {
+
+
+            console.log(workbook, 'workbook instance')
+
+            var worksheet = workbook.getWorksheet(1);
+
+            const additionalFields = worksheet.getRow(4).values;
+            console.log(additionalFields);
+
+
+            for(let i=7;i<additionalFields.length;i++){
+                fields.push(additionalFields[i].toString())
+            }
+
+            fields = fields.join(",")+'\r\n';
+            console.log(fields);
+            for (let i = 5;i<worksheet.actualRowCount+2;i++){
+
+                const headers =[];
+                let coordinates = [74.573650 + Number(i), 55.109332+Number(i)];
+                let row = worksheet.getRow(i).values;
+
+
+               for(let j =7; j<worksheet.actualColumnCount+1;j++){
+                   if (row[j]){
+                       headers.push(Number(row[j]))
+                   }else{
+
+                       headers.push(0)
+                   }
+               }
+
+               let r = (coordinates.concat(headers)).join(",");
+               rows.push(r)
+            }
+            res = fields+rows.join( '\r\n');
+            console.log(typeof(res));
+
+            // workbook.eachSheet((sheet, id) => {
+            //     sheet.eachRow((row, rowIndex) => {
+            //         console.log(row.values, rowIndex)
+            //     })
+            // })
+
+
+        })
+    }
+
+
+    return(res)
+}
+
+
+
+
+
+
