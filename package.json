@@ -8,6 +8,7 @@
     "@testing-library/user-event": "^7.1.2",
     "babel": "^6.23.0",
     "exceljs": "^4.3.0",
+    "kepler": "^1.0.0",
     "kepler.gl": "^2.0.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",

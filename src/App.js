@@ -58,19 +58,17 @@ function Uploading() {
     const [newData, setnewData] = useState(' ');
 
     const dispatch = useDispatch();
-
-
     React.useEffect(() => {
         if (newData!=''&& newData == null) {
             console.log('UPDATED', newData)
             const dataset = {
                 info: {id: 'test_data', label: 'My Csv'},
-                data: processCsvData(newData)
+                data:{newData}
             };
 
             dispatch(addDataToMap({
                 datasets: [dataset],
-                options: {centerMap: true, readOnly: true}
+                options: {centerMap: true, readOnly: false}
             }));
         }
     }, [dispatch, newData]);
@@ -82,14 +80,88 @@ function Uploading() {
         const uploaded = [...uploadedFiles];
         let limitExceeded = false;
         files.some(async (file) => {
-            let data;
+            let data1;
             if (uploaded.findIndex((f) => f.name === file.name) === -1) {
                 uploaded.push(file);
                 console.log('MY FILE', file)
 
-                data = await excelToJson(file);
+                // data1 =  await excelToJson(file);
 
-                setnewData(data);
+                let fields = ["latitude","longitude"];
+                let rows =[];
+                let res='';
+                const wb = new ExcelJS.Workbook();
+                const reader = new FileReader()
+
+                reader.readAsArrayBuffer(file)
+                reader.onload = () => {
+                    const buffer = reader.result;
+                    wb.xlsx.load(buffer).then(workbook => {
+
+
+                        // console.log(workbook, 'workbook instance')
+
+                        var worksheet = workbook.getWorksheet(1);
+
+                        const additionalFields = worksheet.getRow(4).values;
+                        console.log(additionalFields);
+
+
+                        for(let i=7;i<additionalFields.length;i++){
+                            fields.push(additionalFields[i].toString())
+                        }
+
+                        // fields = fields.join(",")+'\n';
+                        console.log(fields);
+                        for (let i = 5;i<worksheet.actualRowCount+2;i++){
+
+                            const headers =[];
+                            let coordinates = [74.573650 + Number(i), 55.109332+Number(i)];
+                            let row = worksheet.getRow(i).values;
+
+
+                            for(let j =7; j<worksheet.actualColumnCount+1;j++){
+                                if (row[j]){
+                                    headers.push(Number(row[j]))
+                                }else{
+
+                                    headers.push(0)
+                                }
+                            }
+
+                            let r = (coordinates.concat(headers)).join(",");
+                            rows.push(r)
+                        }
+                        res = fields+'\n'+rows.join( '\n');
+                        console.log(res);
+                        // console.log(processCsvData(res));
+
+                        // workbook.eachSheet((sheet, id) => {
+                        //     sheet.eachRow((row, rowIndex) => {
+                        //         console.log(row.values, rowIndex)
+                        //     })
+                        // })
+
+                        console.log('here',res)
+                        // setnewData(data);
+                        const dataset = {
+                            info: {id: 'test_data', label: 'My Csv'},
+                            data: processCsvData(res)
+                        };
+
+                        dispatch(addDataToMap({
+                            datasets: [dataset],
+                            options: {centerMap: true, readOnly: true}
+                        }));
+
+
+
+                    })
+                }
+
+
+
+
 
 
                 if (uploaded.length === MAX_COUNT) setFileLimit(true);
@@ -150,7 +222,7 @@ function excelToJson(file) {
         wb.xlsx.load(buffer).then(workbook => {
 
 
-            console.log(workbook, 'workbook instance')
+            // console.log(workbook, 'workbook instance')
 
             var worksheet = workbook.getWorksheet(1);
 
@@ -162,7 +234,7 @@ function excelToJson(file) {
                 fields.push(additionalFields[i].toString())
             }
 
-            fields = fields.join(",")+'\r\n';
+            // fields = fields.join(",")+'\n';
             console.log(fields);
             for (let i = 5;i<worksheet.actualRowCount+2;i++){
 
@@ -171,20 +243,21 @@ function excelToJson(file) {
                 let row = worksheet.getRow(i).values;
 
 
-               for(let j =7; j<worksheet.actualColumnCount+1;j++){
-                   if (row[j]){
-                       headers.push(Number(row[j]))
-                   }else{
+                for(let j =7; j<worksheet.actualColumnCount+1;j++){
+                    if (row[j]){
+                        headers.push(Number(row[j]))
+                    }else{
 
-                       headers.push(0)
-                   }
-               }
+                        headers.push(0)
+                    }
+                }
 
-               let r = (coordinates.concat(headers)).join(",");
-               rows.push(r)
+                let r = (coordinates.concat(headers)).join(",");
+                rows.push(r)
             }
-            res = fields+rows.join( '\r\n');
-            console.log(typeof(res));
+            res = fields+'\n'+rows.join( '\n');
+            console.log(res);
+            // console.log(processCsvData(res));
 
             // workbook.eachSheet((sheet, id) => {
             //     sheet.eachRow((row, rowIndex) => {
@@ -193,13 +266,15 @@ function excelToJson(file) {
             // })
 
 
+
+
+            return(processCsvData(res))
         })
     }
 
 
-    return(res)
+    return(processCsvData(res))
 }
-
 
 
 
