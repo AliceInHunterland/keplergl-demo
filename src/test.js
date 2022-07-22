@@ -47,12 +47,12 @@ const store = createStore(reducers, {}, applyMiddleware(taskMiddleware));
 
 
 export default function App() {
-  return (
-    <Provider store={store}>
-      <Uploading />
-      <Map />
-    </Provider>
-  );
+    return (
+        <Provider store={store}>
+            <Uploading />
+            <Map />
+        </Provider>
+    );
 }
 
 
@@ -63,14 +63,14 @@ export default function App() {
 
 function Map() {
 
-  return (
-    <KeplerGl
-      id="covid"
-      mapboxApiAccessToken='pk.eyJ1IjoiZWt0bGFncmFuemgxIiwiYSI6ImNrczZkd3EwbzAwczkycW96b3ZpbGJuaTMifQ.hVA0mIakF4asjiJmh7gPEA'//{process.env.REACT_APP_MAPBOX_API}
-      width={window.innerWidth}
-      height={window.innerHeight}
-    />
-  );
+    return (
+        <KeplerGl
+            id="covid"
+            mapboxApiAccessToken='pk.eyJ1IjoiZWt0bGFncmFuemgxIiwiYSI6ImNrczZkd3EwbzAwczkycW96b3ZpbGJuaTMifQ.hVA0mIakF4asjiJmh7gPEA'//{process.env.REACT_APP_MAPBOX_API}
+            width={window.innerWidth}
+            height={window.innerHeight}
+        />
+    );
 
 }
 
@@ -96,43 +96,51 @@ function Uploading() {
                 console.log('MY FILE', file)
 
 
-                let values = [];
-                let res='latitude,longitude,value';
+
+                let fields = ["latitude","longitude"];
+                let rows =[];
+                let res='';
                 const wb = new ExcelJS.Workbook();
                 const reader = new FileReader()
 
                 reader.readAsArrayBuffer(file)
                 reader.onload = () => {
                     const buffer = reader.result;
-
                     wb.xlsx.load(buffer).then(workbook => {
 
 
+                        // console.log(workbook, 'workbook instance')
+
                         var worksheet = workbook.getWorksheet(1);
 
+                        const additionalFields = worksheet.getRow(4).values;
+                        console.log(additionalFields);
 
 
+                        for(let i=7;i<additionalFields.length;i++){
+                            fields.push(additionalFields[i].toString())
+                        }
 
-                        for (let i = 7;i<worksheet.actualColumnCount+2;i++){
+                        console.log(fields);
+                        for (let i = 5;i<worksheet.actualRowCount+2;i++){
 
-                            let column = worksheet.getColumn(i).values;
-                            console.log("ONE COLUMN", column)
-                            let splitColumn = column.slice(5)
-                            console.log("NEXT COLUMN", splitColumn)
-                            let colmnSum = 0;
-                            for(let x =0;x< splitColumn.length;x++){
-                                if(splitColumn[x]!=null){
-                                    console.log("VALUE",splitColumn[x])
-                                    colmnSum= colmnSum+Number(splitColumn[x])
+                            const headers =[];
+                            let coordinates = [74.573650 + Number(i), 55.109332+Number(i)];
+                            let row = worksheet.getRow(i).values;
+
+
+                            for(let j =7; j<worksheet.actualColumnCount+1;j++){
+                                if (row[j]){
+                                    headers.push(Number(row[j]))
+                                }else{
+                                    headers.push(0)
                                 }
                             }
 
-                            console.log(colmnSum);
-                            let coordinates = [74.573650 , 55.109332, colmnSum].join(",");
-                            values.push(coordinates);
-
+                            let r = (coordinates.concat(headers)).join(",");
+                            rows.push(r)
                         }
-                        res = res+'\n'+ values.join( '\n');
+                        res = fields+'\n'+rows.join( '\n');
                         console.log(res);
 
 
@@ -141,17 +149,16 @@ function Uploading() {
                         const dataset = {
                             info: {id: 'test_data', label: 'My Csv'},
                             data: processCsvData(res)
-                        }
+                        };
 
                         dispatch(addDataToMap({
                             datasets: [dataset],
                             options: {centerMap: true, readOnly: false}
-                        }))
+                        }));
 
 
 
                     })
-
                 }
 
 
