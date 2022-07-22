@@ -84,7 +84,7 @@ function Uploading() {
 
 
     const dispatch = useDispatch();
-
+    const myDatasets = [];
     const handleUploadFiles = files => {
 
         const uploaded = [...uploadedFiles];
@@ -109,8 +109,10 @@ function Uploading() {
 
 
                         var worksheet = workbook.getWorksheet(1);
-
-
+                        const lat = Number(worksheet.getCell('A2'));
+                        const lon =  Number(worksheet.getCell('B2'));
+                        console.log('LAT',lat)
+                        console.log('LON',lon)
 
 
                         for (let i = 7;i<worksheet.actualColumnCount+2;i++){
@@ -128,7 +130,9 @@ function Uploading() {
                             }
 
                             console.log(colmnSum);
-                            let coordinates = [74.573650 , 55.109332, colmnSum].join(",");
+                            // [lat , lon, colmnSum]
+
+                            let coordinates = [lat , lon, colmnSum].join(",");
                             values.push(coordinates);
 
                         }
@@ -139,12 +143,12 @@ function Uploading() {
                         console.log('here',res)
 
                         const dataset = {
-                            info: {id: 'test_data', label: 'My Csv'},
+                            info: {id: file.name, label: file.name},
                             data: processCsvData(res)
                         }
-
+                        myDatasets.push(dataset);
                         dispatch(addDataToMap({
-                            datasets: [dataset],
+                            datasets: myDatasets ,
                             options: {centerMap: true, readOnly: false}
                         }))
 
