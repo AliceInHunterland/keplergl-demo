@@ -97,7 +97,7 @@ function Uploading() {
 
 
                 let values = [];
-                let res='latitude,longitude,value';
+                let res='latitude,longitude,value,animal';
                 const wb = new ExcelJS.Workbook();
                 const reader = new FileReader()
 
@@ -115,13 +115,16 @@ function Uploading() {
                         console.log('LON',lon)
 
 
-                        for (let i = 7;i<worksheet.actualColumnCount+2;i++){
-
+                        for (let i = 7;i<worksheet.actualColumnCount+1;i++){
+                            let animalName;
                             let column = worksheet.getColumn(i).values;
                             console.log("ONE COLUMN", column)
-                            let splitColumn = column.slice(5)
+                            animalName = column[4];
+                            let splitColumn = column.slice(5);
+                            console.log("ANIMAL", animalName);
                             console.log("NEXT COLUMN", splitColumn)
                             let colmnSum = 0;
+
                             for(let x =0;x< splitColumn.length;x++){
                                 if(splitColumn[x]!=null){
                                     console.log("VALUE",splitColumn[x])
@@ -132,7 +135,7 @@ function Uploading() {
                             console.log(colmnSum);
                             // [lat , lon, colmnSum]
 
-                            let coordinates = [lat , lon, colmnSum].join(",");
+                            let coordinates = [lat , lon, colmnSum , animalName].join(",");
                             values.push(coordinates);
 
                         }
@@ -146,10 +149,26 @@ function Uploading() {
                             info: {id: file.name, label: file.name},
                             data: processCsvData(res)
                         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                         myDatasets.push(dataset);
                         dispatch(addDataToMap({
                             datasets: myDatasets ,
-                            options: {centerMap: true, readOnly: false}
+                            options: {centerMap: true, readOnly: false},
                         }))
 
 
