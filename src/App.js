@@ -11,8 +11,43 @@ import * as ExcelJS from "exceljs";
 import {useState} from "react";
 import {processCsvData} from 'kepler.gl/processors';
 import './uploading.css'
-const MAX_COUNT = 5;
-
+const MAX_COUNT = 10;
+let animalsList = ["Anthozoa",
+    "Ascidia",
+    "Ascophyllum",
+    "Asterias",
+    "Balanus",
+    "Branchiomma",
+    "Buccinum",
+    "Caridea",
+    "Chionoecetes",
+    "Cnidaria",
+    "Crossaster",
+    "Cryptonatica",
+    "Diopedos bispinis",
+    "Fish",
+    "Fucus",
+    "Gersemia fruticosa",
+    "Gorgonocephalus",
+    "Gymnocanthus tricuspis",
+    "Heliometra",
+    "Hormathia",
+    "Human",
+    "Hyas",
+    "Laminaria_digitata",
+    "Lithothamnion",
+    "Mysis oculata",
+    "Ophiopholis",
+    "Ophiura robusta",
+    "Pagurus pubescens",
+    "Porifera",
+    "Strongylocentrotus",
+    "Trash",
+    "Urasterias",
+    "Urticina",
+    "arenicola",
+    "corophiidae",
+    "none"];
 const customizedKeplerGlReducer = keplerGlReducer
     .initialState({
         uiState: {
@@ -74,6 +109,9 @@ function Map() {
 
 }
 
+const removeArrayItem = (arr, itemToRemove) => {
+    return arr.filter(item => item !== itemToRemove)
+}
 
 
 
@@ -125,6 +163,9 @@ function Uploading() {
                             console.log("NEXT COLUMN", splitColumn)
                             let colmnSum = 0;
 
+
+
+
                             for(let x =0;x< splitColumn.length;x++){
                                 if(splitColumn[x]!=null){
                                     console.log("VALUE",splitColumn[x])
@@ -135,9 +176,16 @@ function Uploading() {
                             console.log(colmnSum);
                             // [lat , lon, colmnSum]
 
-                            let coordinates = [lat , lon, colmnSum , animalName].join(",");
+                            let coordinates = [lat, lon, colmnSum, animalName].join(",");
+                            animalsList = removeArrayItem(animalsList, animalName);
+                            console.log("ANIMAL NAME",animalName);
+                            console.log("ANIMAL LIST",animalsList);
                             values.push(coordinates);
 
+                        }
+                        for(let m =0; m<animalsList.length;m++){
+                            let coordinates = [lat, lon, '0', animalsList[m]].join(",");
+                            values.push(coordinates)
                         }
                         res = res+'\n'+ values.join( '\n');
                         console.log(res);
