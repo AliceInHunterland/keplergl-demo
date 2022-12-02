@@ -1,0 +1,23 @@
+{
+  "files": {
+    "main.css": "/keplergl-demo/static/css/main.7f862af1.chunk.css",
+    "main.js": "/keplergl-demo/static/js/main.2f3e477d.chunk.js",
+    "main.js.map": "/keplergl-demo/static/js/main.2f3e477d.chunk.js.map",
+    "runtime-main.js": "/keplergl-demo/static/js/runtime-main.aff1563c.js",
+    "runtime-main.js.map": "/keplergl-demo/static/js/runtime-main.aff1563c.js.map",
+    "static/js/2.725ce674.chunk.js": "/keplergl-demo/static/js/2.725ce674.chunk.js",
+    "static/js/2.725ce674.chunk.js.map": "/keplergl-demo/static/js/2.725ce674.chunk.js.map",
+    "index.html": "/keplergl-demo/index.html",
+    "precache-manifest.1e1c1a4df6ba086cea376602de79642b.js": "/keplergl-demo/precache-manifest.1e1c1a4df6ba086cea376602de79642b.js",
+    "service-worker.js": "/keplergl-demo/service-worker.js",
+    "static/css/main.7f862af1.chunk.css.map": "/keplergl-demo/static/css/main.7f862af1.chunk.css.map",
+    "static/js/2.725ce674.chunk.js.LICENSE.txt": "/keplergl-demo/static/js/2.725ce674.chunk.js.LICENSE.txt",
+    "static/js/main.2f3e477d.chunk.js.LICENSE.txt": "/keplergl-demo/static/js/main.2f3e477d.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.aff1563c.js",
+    "static/js/2.725ce674.chunk.js",
+    "static/css/main.7f862af1.chunk.css",
+    "static/js/main.2f3e477d.chunk.js"
+  ]
+}
