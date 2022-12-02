@@ -1,53 +1,18 @@
-import React from "react";
-import keplerGlReducer from "kepler.gl/reducers";
-import { createStore, combineReducers, applyMiddleware } from "redux";
-import { taskMiddleware } from "react-palm/tasks";
-import { Provider, useDispatch } from "react-redux";
-import KeplerGl from "kepler.gl";
-import { addDataToMap } from "kepler.gl/actions";
-import * as ExcelJS from "exceljs";
 // import useSwr from "swr";
 // import Uploading from "./Uploading";
-import {useState} from "react";
+import React, {useState} from "react";
+import keplerGlReducer from "kepler.gl/reducers";
+import {applyMiddleware, combineReducers, createStore} from "redux";
+import {taskMiddleware} from "react-palm/tasks";
+import {Provider, useDispatch} from "react-redux";
+import KeplerGl from "kepler.gl";
+import {addDataToMap} from "kepler.gl/actions";
+import * as ExcelJS from "exceljs";
 import {processCsvData} from 'kepler.gl/processors';
 import './uploading.css'
+
 const MAX_COUNT = 10;
-let animalsList = ["Anthozoa",
-    "Ascidia",
-    "Ascophyllum",
-    "Asterias",
-    "Balanus",
-    "Branchiomma",
-    "Buccinum",
-    "Caridea",
-    "Chionoecetes",
-    "Cnidaria",
-    "Crossaster",
-    "Cryptonatica",
-    "Diopedos bispinis",
-    "Fish",
-    "Fucus",
-    "Gersemia fruticosa",
-    "Gorgonocephalus",
-    "Gymnocanthus tricuspis",
-    "Heliometra",
-    "Hormathia",
-    "Human",
-    "Hyas",
-    "Laminaria_digitata",
-    "Lithothamnion",
-    "Mysis oculata",
-    "Ophiopholis",
-    "Ophiura robusta",
-    "Pagurus pubescens",
-    "Porifera",
-    "Strongylocentrotus",
-    "Trash",
-    "Urasterias",
-    "Urticina",
-    "arenicola",
-    "corophiidae",
-    "none"];
+
 const customizedKeplerGlReducer = keplerGlReducer
     .initialState({
         uiState: {
@@ -151,6 +116,42 @@ function Uploading() {
                         const lon =  Number(worksheet.getCell('B2'));
                         console.log('LAT',lat)
                         console.log('LON',lon)
+                        let animalsList = ["Anthozoa",
+                            "Ascidia",
+                            "Ascophyllum",
+                            "Asterias",
+                            "Balanus",
+                            "Branchiomma",
+                            "Buccinum",
+                            "Caridea",
+                            "Chionoecetes",
+                            "Cnidaria",
+                            "Crossaster",
+                            "Cryptonatica",
+                            "Diopedos bispinis",
+                            "Fish",
+                            "Fucus",
+                            "Gersemia fruticosa",
+                            "Gorgonocephalus",
+                            "Gymnocanthus tricuspis",
+                            "Heliometra",
+                            "Hormathia",
+                            "Human",
+                            "Hyas",
+                            "Laminaria_digitata",
+                            "Lithothamnion",
+                            "Mysis oculata",
+                            "Ophiopholis",
+                            "Ophiura robusta",
+                            "Pagurus pubescens",
+                            "Porifera",
+                            "Strongylocentrotus",
+                            "Trash",
+                            "Urasterias",
+                            "Urticina",
+                            "arenicola",
+                            "corophiidae",
+                            "none"];
 
 
                         for (let i = 7;i<worksheet.actualColumnCount+1;i++){

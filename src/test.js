@@ -1,16 +1,16 @@
-import React from "react";
-import keplerGlReducer from "kepler.gl/reducers";
-import { createStore, combineReducers, applyMiddleware } from "redux";
-import { taskMiddleware } from "react-palm/tasks";
-import { Provider, useDispatch } from "react-redux";
-import KeplerGl from "kepler.gl";
-import { addDataToMap } from "kepler.gl/actions";
-import * as ExcelJS from "exceljs";
 // import useSwr from "swr";
 // import Uploading from "./Uploading";
-import {useState} from "react";
+import React, {useState} from "react";
+import keplerGlReducer from "kepler.gl/reducers";
+import {applyMiddleware, combineReducers, createStore} from "redux";
+import {taskMiddleware} from "react-palm/tasks";
+import {Provider, useDispatch} from "react-redux";
+import KeplerGl from "kepler.gl";
+import {addDataToMap} from "kepler.gl/actions";
+import * as ExcelJS from "exceljs";
 import {processCsvData} from 'kepler.gl/processors';
 import './uploading.css'
+
 const MAX_COUNT = 5;
 
 const customizedKeplerGlReducer = keplerGlReducer
