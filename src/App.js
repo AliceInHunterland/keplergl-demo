@@ -79,7 +79,8 @@ const removeArrayItem = (arr, itemToRemove) => {
 }
 
 
-
+const myLayers= [];
+const myDatasets = [];
 function Uploading() {
 
     const [uploadedFiles, setUploadedFiles] = useState([])
@@ -87,7 +88,20 @@ function Uploading() {
 
 
     const dispatch = useDispatch();
-    const myDatasets = [];
+
+
+    const sampleConfig = {
+        version: "v1",
+        config: {
+            visState: {
+                filters: [],
+                layers: [],
+            },
+
+
+        }
+    };
+
     const handleUploadFiles = files => {
 
         const uploaded = [...uploadedFiles];
@@ -197,32 +211,135 @@ function Uploading() {
                         const dataset = {
                             info: {id: file.name, label: file.name},
                             data: processCsvData(res)
-                        }
+                        };
+                        const layer = {
+                                id: file.name,
+                                type: "point",
+                                config: {
+                                    dataId: file.name,
+                                    "label": "Point",
+                                    "color": [
+                                        255,
+                                        203,
+                                        153
+                                    ],
+                                    "highlightColor": [
+                                        252,
+                                        242,
+                                        26,
+                                        255
+                                    ],
+                                    "columns": {
+                                        "lat": "latitude",
+                                        "lng": "longitude",
+                                        "altitude": null
+                                    },
+                                    "isVisible": true,
+                                    "visConfig": {
+                                        "radius": 10,
+                                        "fixedRadius": false,
+                                        "opacity": 0.8,
+                                        "outline": false,
+                                        "thickness": 2,
+                                        "strokeColor": null,
+                                        "colorRange": {
+                                            "name": "Uber Viz Qualitative 4",
+                                            "type": "qualitative",
+                                            "category": "Uber",
+                                            "colors": [
+                                                "#12939A",
+                                                "#DDB27C",
+                                                "#88572C",
+                                                "#FF991F",
+                                                "#F15C17",
+                                                "#223F9A",
+                                                "#DA70BF",
+                                                "#125C77",
+                                                "#4DC19C",
+                                                "#776E57",
+                                                "#17B8BE",
+                                                "#F6D18A",
+                                                "#B7885E",
+                                                "#FFCB99",
+                                                "#F89570",
+                                                "#829AE3",
+                                                "#E79FD5",
+                                                "#1E96BE",
+                                                "#89DAC1",
+                                                "#B3AD9E"
+                                            ]
+                                        },
+                                        "strokeColorRange": {
+                                            "name": "Global Warming",
+                                            "type": "sequential",
+                                            "category": "Uber",
+                                            "colors": [
+                                                "#5A1846",
+                                                "#900C3F",
+                                                "#C70039",
+                                                "#E3611C",
+                                                "#F1920E",
+                                                "#FFC300"
+                                            ]
+                                        },
+                                        "radiusRange": [
+                                            0,
+                                            50
+                                        ],
+                                        "filled": true
+                                    },
+                                    "hidden": false,
+                                    "textLabel": [
+                                        {
+                                            "field": null,
+                                            "color": [
+                                                255,
+                                                255,
+                                                255
+                                            ],
+                                            "size": 18,
+                                            "offset": [
+                                                0,
+                                                0
+                                            ],
+                                            "anchor": "start",
+                                            "alignment": "center"
+                                        }
+                                    ]
+                                },
+                            "visualChannels": {
+                                "colorField": {
+                                    "name": "animal",
+                                    "type": "string"
+                                },
+                                "colorScale": "ordinal",
+                                "strokeColorField": null,
+                                "strokeColorScale": "quantile",
+                                "sizeField": {
+                                    "name": "value",
+                                    "type": "integer"
+                                },
+                                "sizeScale": "sqrt"
+                            }
+                        };
+                        console.log(sampleConfig["config"]["visState"]["layers"])
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+                        myLayers.push(layer)
+                        console.log(myLayers)
+                        sampleConfig["config"]["visState"]["layers"] = myLayers
+                        console.log(sampleConfig["config"]["visState"]["layers"])
 
                         myDatasets.push(dataset);
                         dispatch(addDataToMap({
                             datasets: myDatasets ,
                             options: {centerMap: true, readOnly: false},
+                            config: sampleConfig
                         }))
 
 
 
                     })
+
 
                 }
 
