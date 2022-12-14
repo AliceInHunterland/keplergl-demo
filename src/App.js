@@ -250,7 +250,12 @@ function Uploading() {
     }
 
     return (
-        <div className="Uploading">
+        <div className="Uploading"  style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '20vh',
+        }}>
 
             <input id='fileUpload' type='file' multiple
                    accept='.xlsx, .xls'

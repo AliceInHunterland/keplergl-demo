@@ -185,12 +185,13 @@ function Uploading() {
     }
 
     return (
-        <div className="Uploading">
+        <div  className="Uploading">
 
             <input id='fileUpload' type='file' multiple
                    accept='.xlsx, .xls'
                    onChange={handleFileEvent}
                    disabled={fileLimit}
+
             />
 
             <label htmlFor='fileUpload'>
